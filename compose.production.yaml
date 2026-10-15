@@ -11,3 +11,8 @@ services:
       TRUST_PROXY: ${TRUST_PROXY:?Set TRUST_PROXY in the VPS .env file}
     restart: unless-stopped
     stop_grace_period: 15s
+
+networks:
+  default:
+    external: true
+    name: rand_default
