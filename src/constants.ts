@@ -11,7 +11,7 @@ export const ROUTES = {
   hex: "/hex",
   base64: "/base64",
   base64url: "/base64url",
-  optionalByteLength: "{/:byteLength}",
+  optionalParam: (param: string) => `{/:${param}}`,
 } as const;
 
 export const FORMATS = {
