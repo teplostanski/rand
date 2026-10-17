@@ -1,7 +1,7 @@
 import type { INFO } from "../constants.js";
 
 export const formatServiceInfo = (info: typeof INFO): string => {
-  return `${info.name} v${info.version}
+  return `${info.name} API v${info.apiVersion}
 ${info.description}
 
 Usage:
