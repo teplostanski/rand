@@ -32,15 +32,19 @@ Base URL: `https://rand.hacks.run`.
 
 ```text
 GET /{encoding}/{byteLength}
+GET /nanoid/{length}
 ```
 
 | Parameter | Values | Default |
 | --- | --- | --- |
-| `encoding` | `hex`, `base64` | Required |
-| `byteLength` | Integer from 1 to 1000; optional | `16` |
+| `encoding` | `hex`, `base64`, `base64url` | Required for encoded bytes |
+| `byteLength` | Integer from 1 to 1000 bytes; optional for encodings | `16` |
+| `length` | Integer from 1 to 1000 characters; optional for Nano ID | `21` |
 | `format` (query) | `text`, `json` | `text` |
 
 `byteLength` is the number of random bytes **before encoding**, not the length of the resulting string. For example, 16 bytes produce 32 hex characters or 24 base64 characters, including padding.
+
+Encoded bytes are available through `/hex`, `/base64`, and `/base64url`. Identifiers are available through `/nanoid`; its `length` counts output characters and defaults to 21. Shorter IDs have a higher collision probability. UUID support is planned and is not currently available.
 
 ### curl
 
@@ -50,6 +54,9 @@ curl 'https://rand.hacks.run/hex'
 
 # 32 random bytes as base64 (JSON)
 curl 'https://rand.hacks.run/base64/32?format=json'
+
+# Nano ID with 21 characters (JSON)
+curl 'https://rand.hacks.run/nanoid/21?format=json'
 ```
 
 ### JavaScript
@@ -76,7 +83,7 @@ const { base64 } = await response.json();
 console.log(base64);
 ```
 
-JSON responses use the encoding as the key: `hex` or `base64`. Text responses contain only the encoded value and use `Content-Type: text/plain`.
+JSON responses use the generator name as the key: `hex`, `base64`, `base64url`, or `nanoid`. For example, `/nanoid?format=json` returns `{"nanoid":"..."}`. Text responses contain only the generated value and use `Content-Type: text/plain`.
 
 ### Service information
 

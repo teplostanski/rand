@@ -1,7 +1,7 @@
 {
   "name": "rand",
   "description": "A small service for generating cryptographically secure random data through a simple API.",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "private": true,
   "type": "module",
   "packageManager": "pnpm@12.11.2",
@@ -18,7 +18,8 @@
     "format": "biome format --write ."
   },
   "dependencies": {
-    "express": "^5.2.1"
+    "express": "^5.2.1",
+    "nanoid": "^6.0.2"
   },
   "devDependencies": {
     "@biomejs/biome": "^2.5.15",

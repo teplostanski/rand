@@ -1,16 +1,13 @@
 import { Router } from "express";
-import { FORMATS, ROUTES } from "../constants.js";
+import { FORMATS, type Generator, ROUTES } from "../constants.js";
 import { responseFormat } from "../middleware/response-format.js";
 import {
   type LengthOptions,
   validateLength,
 } from "../middleware/validate-length.js";
-import { type Encoding } from "../utils/generate-random-string.js";
-
-type RandomKey = Encoding | "nanoid";
 
 type RandomRouterOptions = {
-  responseKey: RandomKey;
+  responseKey: Generator;
   length: LengthOptions;
   generate: (length: number) => string;
 };
