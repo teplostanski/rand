@@ -18,6 +18,9 @@ FROM dependencies AS production-dependencies
 RUN pnpm install --frozen-lockfile --prod
 
 FROM base AS runtime
+ARG BUILD_COMMIT=""
+ARG BUILD_DATE=""
+ENV BUILD_COMMIT=${BUILD_COMMIT} BUILD_DATE=${BUILD_DATE}
 ENV NODE_ENV=production HOST=0.0.0.0 PORT=3000
 COPY --from=production-dependencies /app/node_modules ./node_modules
 COPY --from=build /app/dist ./dist

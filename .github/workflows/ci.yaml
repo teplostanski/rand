@@ -60,10 +60,16 @@ jobs:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Prepare build metadata
+        id: build_meta
+        run: echo "date=$(date -u +%Y-%m-%d)" >> "$GITHUB_OUTPUT"
       - name: Build and push
         uses: docker/build-push-action@v7
         with:
           context: .
+          build-args: |
+            BUILD_COMMIT=${{ github.sha }}
+            BUILD_DATE=${{ steps.build_meta.outputs.date }}
           platforms: linux/amd64
           push: true
           tags: |
