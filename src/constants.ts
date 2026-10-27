@@ -6,6 +6,7 @@ export const DEFAULT_ID_LENGTH = 21;
 export const MAX_ID_LENGTH = 1_000;
 
 const API_VERSION = "1.2";
+const IS_DEVELOPMENT = process.env.NODE_ENV === "development";
 
 export const ROUTES = {
   root: "/",
@@ -59,8 +60,12 @@ export const INFO = {
     errors: "400 for invalid length or format; errors are plain text.",
   },
   build: {
-    commit: process.env.BUILD_COMMIT?.trim() || undefined,
-    date: process.env.BUILD_DATE?.trim() || undefined,
+    commit:
+      process.env.BUILD_COMMIT?.trim() ||
+      (IS_DEVELOPMENT ? "0000000" : undefined),
+    date:
+      process.env.BUILD_DATE?.trim() ||
+      (IS_DEVELOPMENT ? new Date().toISOString().slice(0, 10) : undefined),
   },
   githubUrl: "https://github.com/teplostanski/rand",
 } as const;

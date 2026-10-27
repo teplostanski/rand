@@ -5,34 +5,33 @@ export const formatServiceInfo = (info: typeof INFO): string => {
     Boolean,
   );
   const buildLine = buildDetails.length
-    ? `\nBuild: ${buildDetails.join(" · ")}\n`
+    ? `\nBUILD: ${buildDetails.join(" · ")}\n`
     : "";
 
   return `${info.name} API v${info.apiVersion}
 ${info.description}
 
-Usage:
+USAGE:
   ${info.usage.endpoints.join("\n  ")}
 
-Encodings:
+ENCODINGS:
   ${info.usage.encodings.join(", ")}
 
-IDs:
+IDS:
   ${info.usage.ids.join(", ")}
 
-Parameters:
+PARAMETERS:
   byteLength  ${info.usage.byteLength}
   length      ${info.usage.length}
   format      ${info.usage.responseFormat}
 
-Examples:
+EXAMPLES:
 ${info.usage.examples.map((example) => `  ${example}`).join("\n")}
 
-Errors:
+ERRORS:
   ${info.usage.errors}
 
-Github:
+GITHUB:
   ${info.githubUrl}
-
 ${buildLine}`;
 };
