@@ -197,6 +197,9 @@ importers:
       nanoid:
         specifier: ^6.0.2
         version: 6.0.2
+      undevice:
+        specifier: 1.0.0-beta
+        version: 1.0.0-beta
     devDependencies:
       '@biomejs/biome':
         specifier: ^2.5.15
@@ -851,6 +854,10 @@ packages:
     engines: {node: '>=16.20.0'}
     hasBin: true
 
+  undevice@1.0.0-beta:
+    resolution: {integrity: sha512-uus9PhOcIP0DsgSwqWpTefRDeJPj3+4Wm/KOh3O0zAQMsq8hEsb3M14B9Purg26UEIuBhyfRbXn8YG660KAP6A==}
+    engines: {node: '>=22'}
+
   undici-types@7.24.6:
     resolution: {integrity: sha512-WRNW+sJgj5OBN4/0JpHFqtqzhpbnV0GuB+OozA9gCL7a993SmU+1JBZCzLNxYsbMfIeDL+lTsphD5jN5N+n0zg==}
 
@@ -1434,6 +1441,8 @@ snapshots:
       '@typescript/typescript-sunos-x64': 7.0.2
       '@typescript/typescript-win32-arm64': 7.0.2
       '@typescript/typescript-win32-x64': 7.0.2
+
+  undevice@1.0.0-beta: {}
 
   undici-types@7.24.6: {}
 

@@ -21,6 +21,7 @@ export const ROUTES = {
 export const FORMATS = {
   plainText: "text",
   json: "json",
+  prettyJson: "pretty",
 } as const;
 
 export const ENCODINGS = {
@@ -47,17 +48,19 @@ export const INFO = {
     ids: Object.values(IDS),
     byteLength: `Optional. 1–${MAX_BYTE_LENGTH} bytes before encoding; default: ${DEFAULT_BYTE_LENGTH}.`,
     length: `Optional for Nano ID. 1–${MAX_ID_LENGTH} characters; default: ${DEFAULT_ID_LENGTH}. Shorter IDs have a higher collision probability.`,
-    responseFormat: "?format=text (default) or ?format=json.",
+    responseFormat:
+      "Plain text by default; ?json for compact JSON, ?pretty for JSON with two-space indentation. Flag values are ignored; ?pretty takes precedence. Unknown query parameters are ignored.",
     examples: [
       "/hex",
-      "/hex/32?format=json",
+      "/hex/32?json",
+      "/hex?pretty",
       "/base64url/16",
       "/nanoid",
-      "/nanoid/21?format=json",
+      "/nanoid/21?json",
     ],
     response:
       'Plain text or a JSON object keyed by generator, e.g. {"hex":"a3f1"}.',
-    errors: "400 for invalid length or format; errors are plain text.",
+    errors: "400 for invalid length; errors are plain text.",
   },
   build: {
     commit:

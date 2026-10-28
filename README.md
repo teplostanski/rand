@@ -40,11 +40,16 @@ GET /nanoid/{length}
 | `encoding` | `hex`, `base64`, `base64url` | Required for encoded bytes |
 | `byteLength` | Integer from 1 to 1000 bytes; optional for encodings | `16` |
 | `length` | Integer from 1 to 1000 characters; optional for Nano ID | `21` |
-| `format` (query) | `text`, `json` | `text` |
 
 `byteLength` is the number of random bytes **before encoding**, not the length of the resulting string. For example, 16 bytes produce 32 hex characters or 24 base64 characters, including padding.
 
 Encoded bytes are available through `/hex`, `/base64`, and `/base64url`. Identifiers are available through `/nanoid`; its `length` counts output characters and defaults to 21. Shorter IDs have a higher collision probability. UUID support is planned and is not currently available.
+
+### Response format
+
+Responses are plain text by default. Add `?json` for compact JSON or `?pretty` for JSON with two-space indentation. If both flags are present (`?json&pretty`), `pretty` takes precedence. Only presence matters: `?json`, `?json=`, and `?json=false` all request JSON. Unknown query parameters are ignored.
+
+These flags apply to generator endpoints. `/` always returns plain text, and `/health` always returns JSON.
 
 ### curl
 
@@ -53,10 +58,13 @@ Encoded bytes are available through `/hex`, `/base64`, and `/base64url`. Identif
 curl 'https://rand.hacks.run/hex'
 
 # 32 random bytes as base64 (JSON)
-curl 'https://rand.hacks.run/base64/32?format=json'
+curl 'https://rand.hacks.run/base64/32?json'
 
 # Nano ID with 21 characters (JSON)
-curl 'https://rand.hacks.run/nanoid/21?format=json'
+curl 'https://rand.hacks.run/nanoid/21?json'
+
+# 16 random bytes as hex (indented JSON)
+curl 'https://rand.hacks.run/hex?pretty'
 ```
 
 ### JavaScript
@@ -76,14 +84,14 @@ console.log(hex);
 Read a JSON response:
 
 ```js
-const response = await fetch('https://rand.hacks.run/base64/32?format=json');
+const response = await fetch('https://rand.hacks.run/base64/32?json');
 if (!response.ok) throw new Error(await response.text());
 
 const { base64 } = await response.json();
 console.log(base64);
 ```
 
-JSON responses use the generator name as the key: `hex`, `base64`, `base64url`, or `nanoid`. For example, `/nanoid?format=json` returns `{"nanoid":"..."}`. Text responses contain only the generated value and use `Content-Type: text/plain`.
+JSON responses use the generator name as the key: `hex`, `base64`, `base64url`, or `nanoid`. For example, `/nanoid?json` returns `{"nanoid":"..."}`. Both JSON formats use `Content-Type: application/json`. Text responses contain only the generated value and use `Content-Type: text/plain`.
 
 ### Service information
 
@@ -91,7 +99,7 @@ JSON responses use the generator name as the key: `hex`, `base64`, `base64url`, 
 
 ### Errors
 
-Invalid lengths and unsupported response formats return `400`. Unmatched routes return `404`. These responses use plain text, including when `format=json` is requested. Check `response.ok` before parsing JSON, as shown above.
+Invalid lengths return `400`. Unmatched routes return `404`. These responses use plain text, including when `?json` or `?pretty` is requested. Check `response.ok` before parsing JSON, as shown above.
 
 ## Self-hosting: deploy your fork on a VPS
 

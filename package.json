@@ -19,7 +19,8 @@
   },
   "dependencies": {
     "express": "^5.2.1",
-    "nanoid": "^6.0.2"
+    "nanoid": "^6.0.2",
+    "undevice": "1.0.0-beta"
   },
   "devDependencies": {
     "@biomejs/biome": "^2.5.15",

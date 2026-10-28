@@ -1,10 +1,12 @@
 import { Router } from "express";
-import { FORMATS, type Generator, ROUTES } from "../constants.js";
+import { type Generator, ROUTES } from "../constants.js";
 import { responseFormat } from "../middleware/response-format.js";
 import {
   type LengthOptions,
   validateLength,
 } from "../middleware/validate-length.js";
+
+import { sendFormatted } from "../utils/send-formatted.js";
 
 type RandomRouterOptions = {
   responseKey: Generator;
@@ -27,12 +29,7 @@ export const createRandomRouter = ({
     (_req, res) => {
       const value = generate(res.locals[length.param]);
 
-      if (res.locals.format === FORMATS.json) {
-        res.json({ [responseKey]: value });
-        return;
-      }
-
-      res.type("text/plain").send(value);
+      sendFormatted(res, { [responseKey]: value }, value);
     },
   );
 

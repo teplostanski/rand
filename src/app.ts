@@ -11,7 +11,6 @@ import { sendError } from "./utils/send-error.js";
 export const app = express();
 
 app.disable("x-powered-by");
-app.set("json spaces", 2);
 
 if (process.env.TRUST_PROXY?.trim()) {
   app.set("trust proxy", process.env.TRUST_PROXY);

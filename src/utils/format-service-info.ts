@@ -23,7 +23,9 @@ IDS:
 PARAMETERS:
   byteLength  ${info.usage.byteLength}
   length      ${info.usage.length}
-  format      ${info.usage.responseFormat}
+
+RESPONSE FORMAT:
+  ${info.usage.responseFormat}
 
 EXAMPLES:
 ${info.usage.examples.map((example) => `  ${example}`).join("\n")}
