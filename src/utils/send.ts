@@ -1,7 +1,7 @@
 import type { Response } from "express";
 import { FORMATS } from "../constants.js";
 
-export const sendFormatted = (res: Response, data: unknown, text: string) => {
+export const send = (res: Response, data: unknown, text: string) => {
   const format = res.locals.format;
 
   if (format === FORMATS.json || format === FORMATS.prettyJson) {

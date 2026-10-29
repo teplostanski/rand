@@ -6,7 +6,7 @@ import {
   validateLength,
 } from "../middleware/validate-length.js";
 
-import { sendFormatted } from "../utils/send-formatted.js";
+import { send } from "../utils/send.js";
 
 type RandomRouterOptions = {
   responseKey: Generator;
@@ -29,7 +29,7 @@ export const createRandomRouter = ({
     (_req, res) => {
       const value = generate(res.locals[length.param]);
 
-      sendFormatted(res, { [responseKey]: value }, value);
+      send(res, { [responseKey]: value }, value);
     },
   );
 

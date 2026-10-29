@@ -1,4 +1,5 @@
 import express from "express";
+import { undevice } from "undevice/express";
 import { ROUTES } from "./constants.js";
 import { base64Router } from "./routes/base64.js";
 import { base64urlRouter } from "./routes/base64url.js";
@@ -21,6 +22,10 @@ app.use((_req, res, next) => {
   res.set("X-Written-By", "human");
   next();
 });
+
+export const undeviceMiddleware = undevice({ isRawClient: ["curl", "wget"] });
+
+app.use(undeviceMiddleware);
 
 app.use(healthRouter);
 app.use(ROUTES.root, rootRouter);

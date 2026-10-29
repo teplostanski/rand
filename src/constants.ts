@@ -1,5 +1,7 @@
 import packageInfo from "../package.json" with { type: "json" };
 
+export const NEW_LINE = "\n";
+
 export const DEFAULT_BYTE_LENGTH = 16;
 export const MAX_BYTE_LENGTH = 1_000;
 export const DEFAULT_ID_LENGTH = 21;
@@ -39,15 +41,13 @@ export type Generator =
   | (typeof IDS)[keyof typeof IDS];
 
 export const INFO = {
+  baseUrl: "https://rand.hacks.run",
   name: packageInfo.name,
   description: packageInfo.description,
   apiVersion: API_VERSION,
   usage: {
-    endpoints: ["GET /{encoding}/{byteLength}", "GET /nanoid/{length}"],
     encodings: Object.values(ENCODINGS),
     ids: Object.values(IDS),
-    byteLength: `Optional. 1–${MAX_BYTE_LENGTH} bytes before encoding; default: ${DEFAULT_BYTE_LENGTH}.`,
-    length: `Optional for Nano ID. 1–${MAX_ID_LENGTH} characters; default: ${DEFAULT_ID_LENGTH}. Shorter IDs have a higher collision probability.`,
     responseFormat:
       "Plain text by default; ?json for compact JSON, ?pretty for JSON with two-space indentation. Flag values are ignored; ?pretty takes precedence. Unknown query parameters are ignored.",
     examples: [
@@ -58,8 +58,6 @@ export const INFO = {
       "/nanoid",
       "/nanoid/21?json",
     ],
-    response:
-      'Plain text or a JSON object keyed by generator, e.g. {"hex":"a3f1"}.',
     errors: "400 for invalid length; errors are plain text.",
   },
   build: {

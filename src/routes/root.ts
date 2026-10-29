@@ -5,5 +5,8 @@ import { formatServiceInfo } from "../utils/format-service-info.js";
 export const rootRouter = Router();
 
 rootRouter.get(ROUTES.root, (_req, res) => {
-  res.type("text/plain").send(formatServiceInfo(INFO));
+  res.vary("User-Agent");
+  res
+    .type("text/plain")
+    .send(formatServiceInfo(INFO, res.locals.undevice.isRawClient));
 });
