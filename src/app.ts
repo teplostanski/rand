@@ -1,4 +1,6 @@
+import { fileURLToPath } from "node:url";
 import express from "express";
+import { isBot } from "isbot";
 import { undevice } from "undevice/express";
 import { ROUTES } from "./constants.js";
 import { base64Router } from "./routes/base64.js";
@@ -13,6 +15,22 @@ export const app = express();
 
 app.disable("x-powered-by");
 
+app.get("/og-image.png", (_req, res) => {
+  res.sendFile(
+    fileURLToPath(new URL("../assets/og/og-image.png", import.meta.url)),
+  );
+});
+
+app.use(
+  express.static(
+    fileURLToPath(new URL("../assets/favicons/", import.meta.url)),
+    {
+      index: false,
+      redirect: false,
+    },
+  ),
+);
+
 if (process.env.TRUST_PROXY?.trim()) {
   app.set("trust proxy", process.env.TRUST_PROXY);
 }
@@ -23,7 +41,10 @@ app.use((_req, res, next) => {
   next();
 });
 
-export const undeviceMiddleware = undevice({ isRawClient: ["curl", "wget"] });
+export const undeviceMiddleware = undevice({
+  isRawClient: ["curl", "wget"],
+  isCrawler: isBot,
+});
 
 app.use(undeviceMiddleware);
 

@@ -25,6 +25,8 @@ ENV NODE_ENV=production HOST=0.0.0.0 PORT=3000
 COPY --from=production-dependencies /app/node_modules ./node_modules
 COPY --from=build /app/dist ./dist
 COPY package.json ./package.json
+COPY assets/favicons ./assets/favicons
+COPY assets/og/og-image.png ./assets/og/og-image.png
 USER node
 EXPOSE 3000
 HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \

@@ -19,6 +19,7 @@
   },
   "dependencies": {
     "express": "^5.2.1",
+    "isbot": "^5.2.2",
     "nanoid": "^6.0.2",
     "undevice": "1.1.0"
   },

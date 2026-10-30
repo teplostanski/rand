@@ -6,3 +6,8 @@
 !tsconfig.build.json
 !src/
 !src/**
+!assets/
+!assets/favicons/
+!assets/favicons/**
+!assets/og/
+!assets/og/og-image.png

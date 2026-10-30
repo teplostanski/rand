@@ -49,7 +49,7 @@ Encoded bytes are available through `/hex`, `/base64`, and `/base64url`. Identif
 
 Responses are plain text by default. Add `?json` for compact JSON or `?pretty` for JSON with two-space indentation. If both flags are present (`?json&pretty`), `pretty` takes precedence. Only presence matters: `?json`, `?json=`, and `?json=false` all request JSON. Unknown query parameters are ignored.
 
-These flags apply to generator endpoints. `/` always returns plain text, and `/health` always returns JSON.
+These flags apply to generator endpoints. `/` returns HTML with social metadata to recognized crawlers and plain text to other clients, including curl and wget. `/health` always returns JSON.
 
 ### curl
 
@@ -101,7 +101,7 @@ JSON responses use the generator name as the key: `hex`, `base64`, `base64url`, 
 
 ### Service information
 
-`GET /` returns the service description and usage guide as plain text.
+`GET /` returns the service description and usage guide. The custom `undevice` flag `isCrawler` uses `isbot` to detect crawlers by User-Agent. Crawlers receive the same information in HTML with Open Graph and Twitter Card metadata; other clients receive plain text. curl and wget retain their terminal formatting even when recognized by `isbot`. Responses include `Vary: User-Agent`.
 
 ### Errors
 
@@ -127,6 +127,13 @@ curl http://127.0.0.1:3000/hex
 ```
 
 For deployment from your own fork with GitHub Actions and Caddy, see the [self-hosting guide](./SELF_HOSTING.md).
+
+## Social image
+
+The 1200×630 social image is served at `/og-image.png`. Its editable source is
+[`assets/og/og-image.html`](./assets/og/og-image.html); capture it at 1200×630 to
+update `assets/og/og-image.png`. The root route includes Open Graph and Twitter Card metadata in its HTML response
+for crawlers. Generator endpoints continue to serve plain text and JSON.
 
 ## License
 
