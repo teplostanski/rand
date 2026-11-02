@@ -7,7 +7,7 @@ export const rootRouter = Router();
 
 rootRouter.get(ROUTES.root, (_req, res) => {
   res.vary("User-Agent");
-  if (res.locals.undevice.isCrawler && !res.locals.undevice.isRawClient) {
+  if (res.locals.undevice.isCrawler) {
     res.type("html").send(formatServiceHtml(INFO));
     return;
   }

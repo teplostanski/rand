@@ -41,9 +41,14 @@ app.use((_req, res, next) => {
   next();
 });
 
+const rawClients = ["curl", "wget"];
+
 export const undeviceMiddleware = undevice({
-  isRawClient: ["curl", "wget"],
-  isCrawler: isBot,
+  isRawClient: rawClients,
+  isCrawler: {
+    detect: isBot,
+    exclude: rawClients,
+  },
 });
 
 app.use(undeviceMiddleware);
