@@ -2,7 +2,7 @@ import type { RequestHandler } from "express";
 import { sendError } from "../utils/send-error.js";
 
 export type LengthOptions = {
-  param: "byteLength" | "length";
+  param: "byteLength" | "nanoidLength";
   defaultValue: number;
   max: number;
 };
