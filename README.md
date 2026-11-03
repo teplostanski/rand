@@ -8,7 +8,7 @@ A small service for generating cryptographically secure random data through a si
 
 ## Run locally
 
-Requires Node.js 24+ and pnpm.
+Requires Node.js 24.16+ (24.x) or 26.1+ and pnpm. UUIDv7 generation uses the built-in `crypto.randomUUIDv7` API.
 
 ```sh
 pnpm install
@@ -32,18 +32,22 @@ Base URL: `https://rand.hacks.run`.
 
 ```text
 GET /{encoding}/{byteLength}
-GET /nanoid/{length}
+GET /nanoid/{nanoidLength}
+GET /uuid
+GET /uuidv7
 ```
 
 | Parameter | Values | Default |
 | --- | --- | --- |
 | `encoding` | `hex`, `base64`, `base64url` | Required for encoded bytes |
 | `byteLength` | Integer from 1 to 1000 bytes; optional for encodings | `16` |
-| `length` | Integer from 1 to 1000 characters; optional for Nano ID | `21` |
+| `nanoidLength` | Integer from 1 to 1000 characters; optional for Nano ID | `21` |
 
 `byteLength` is the number of random bytes **before encoding**, not the length of the resulting string. For example, 16 bytes produce 32 hex characters or 24 base64 characters, including padding.
 
-Encoded bytes are available through `/hex`, `/base64`, and `/base64url`. Identifiers are available through `/nanoid`; its `length` counts output characters and defaults to 21. Shorter IDs have a higher collision probability. UUID support is planned and is not currently available.
+Encoded bytes are available through `/hex`, `/base64`, and `/base64url`. Identifiers are available through `/nanoid`; its `nanoidLength` counts output characters and defaults to 21. Shorter IDs have a higher collision probability.
+
+`/uuid` generates a random UUIDv4. `/uuidv7` generates a UUIDv7 containing a millisecond Unix timestamp and random bits. UUIDs always contain 36 characters, including hyphens. Neither endpoint accepts path parameters or a custom length. Both support `?json` and `?pretty`.
 
 ### Response format
 
@@ -66,6 +70,16 @@ curl 'rand.hacks.run/base64/32?json'
 Nano ID with 21 characters (_JSON_)
 ```bash
 curl 'rand.hacks.run/nanoid/21?json'
+```
+
+UUIDv4 (_plain text_)
+```bash
+curl rand.hacks.run/uuid
+```
+
+UUIDv7 (_JSON_)
+```bash
+curl 'rand.hacks.run/uuidv7?json'
 ```
 
 16 random bytes as hex (_indented JSON_)
@@ -97,7 +111,7 @@ const { base64 } = await response.json();
 console.log(base64);
 ```
 
-JSON responses use the generator name as the key: `hex`, `base64`, `base64url`, or `nanoid`. For example, `/nanoid?json` returns `{"nanoid":"..."}`. Both JSON formats use `Content-Type: application/json`. Text responses contain only the generated value and use `Content-Type: text/plain`.
+JSON responses use the generator name as the key: `hex`, `base64`, `base64url`, `nanoid`, `uuid`, or `uuidv7`. For example, `/nanoid?json` returns `{"nanoid":"..."}`. Both JSON formats use `Content-Type: application/json`. Text responses contain only the generated value and use `Content-Type: text/plain`.
 
 ### Service information
 
@@ -105,7 +119,7 @@ JSON responses use the generator name as the key: `hex`, `base64`, `base64url`, 
 
 ### Errors
 
-Invalid lengths return `400`. Unmatched routes return `404`. These responses use plain text, including when `?json` or `?pretty` is requested. Check `response.ok` before parsing JSON, as shown above.
+Invalid lengths and unsupported UUID path parameters return `400`. For example, `/uuid/8` returns `Path parameters, including length, are not supported for /uuid. Use /uuid without path parameters.` The same rule applies to `/uuidv7/8` and paths with multiple extra segments. Unknown query parameters remain ignored. Unmatched routes return `404`. These responses use plain text, including when `?json` or `?pretty` is requested. Check `response.ok` before parsing JSON, as shown above.
 
 ## Deploy with Docker
 

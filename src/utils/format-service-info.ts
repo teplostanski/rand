@@ -35,7 +35,9 @@ ${blue("USAGE:")}
   Base URL: ${info.baseUrl}
 
   ${green("GET")} /${green("{")}encoding${green("}")}/${green("{")}byteLength${green("}")}
-  ${green("GET")} /nanoid/${green("{")}length${green("}")}
+  ${green("GET")} /nanoid/${green("{")}nanoidLength${green("}")}
+  ${green("GET")} /uuid
+  ${green("GET")} /uuidv7
 
 ${blue("ENCODINGS:")}
   ${info.usage.encodings.join(", ")}
@@ -44,14 +46,17 @@ ${blue("IDS:")}
   ${info.usage.ids.join(", ")}
 
 ${blue("PARAMETERS:")}
-  byteLength  ${yellow(`1–${MAX_BYTE_LENGTH}`)} bytes
-              default: ${yellow(String(DEFAULT_BYTE_LENGTH))}
+  byteLength    ${yellow(`1–${MAX_BYTE_LENGTH}`)} bytes
+                default: ${yellow(String(DEFAULT_BYTE_LENGTH))}
 
-  length      ${yellow(`1–${MAX_ID_LENGTH}`)} chars
-              default: ${yellow(String(DEFAULT_ID_LENGTH))}
+  nanoidLength  ${yellow(`1–${MAX_ID_LENGTH}`)} chars
+                default: ${yellow(String(DEFAULT_ID_LENGTH))}
 
-Both parameters are optional.
-Shorter Nano IDs have a higher collision probability.
+  - ${yellow("byteLength")}: optional, for encoded bytes.
+  - ${yellow("nanoidLength")}: optional, for ${green("/nanoid")}.
+    Shorter Nano IDs have a higher collision probability.
+  - ${green("/uuid")}: UUIDv4; ${green("/uuidv7")}: UUIDv7 with a timestamp.
+    Both: 36 characters including hyphens, ${yellow("no path parameters")}.
 
 ${blue("RESPONSE FORMAT:")}
   ${info.usage.responseFormat.replace(/\?(?:json|pretty)/g, (match) => yellow(match))}
@@ -60,7 +65,8 @@ ${blue("EXAMPLES:")}
 ${info.usage.examples.map((example) => `  ${example}`).join("\n")}
 
 ${blue("ERRORS:")}
-  ${info.usage.errors}
+${info.usage.errors.map(({ status, description }) => `  - ${yellow(String(status))} for ${description}.`).join("\n")}
+  Errors are plain text.
 
 ${blue("GITHUB:")}
   ${info.githubUrl}

@@ -9,6 +9,8 @@ import { healthRouter } from "./routes/health.js";
 import { hexRouter } from "./routes/hex.js";
 import { nanoidRouter } from "./routes/nanoid.js";
 import { rootRouter } from "./routes/root.js";
+import { uuidRouter } from "./routes/uuid.js";
+import { uuidv7Router } from "./routes/uuidv7.js";
 import { sendError } from "./utils/send-error.js";
 
 export const app = express();
@@ -59,6 +61,8 @@ app.use(ROUTES.hex, hexRouter);
 app.use(ROUTES.base64, base64Router);
 app.use(ROUTES.base64url, base64urlRouter);
 app.use(ROUTES.nanoid, nanoidRouter);
+app.use(uuidRouter);
+app.use(uuidv7Router);
 
 app.use((req, res) => {
   sendError(res, 404, `Cannot ${req.method} ${req.path}`);

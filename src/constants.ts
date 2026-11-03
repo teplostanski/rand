@@ -7,7 +7,7 @@ export const MAX_BYTE_LENGTH = 1_000;
 export const DEFAULT_ID_LENGTH = 21;
 export const MAX_ID_LENGTH = 1_000;
 
-const API_VERSION = "1.2";
+const API_VERSION = "1.3";
 const IS_DEVELOPMENT = process.env.NODE_ENV === "development";
 
 export const ROUTES = {
@@ -17,6 +17,8 @@ export const ROUTES = {
   base64: "/base64",
   base64url: "/base64url",
   nanoid: "/nanoid",
+  uuid: "/uuid",
+  uuidv7: "/uuidv7",
   optionalParam: (param: string) => `{/:${param}}`,
 } as const;
 
@@ -34,6 +36,8 @@ export const ENCODINGS = {
 
 export const IDS = {
   nanoid: "nanoid",
+  uuid: "uuid",
+  uuidv7: "uuidv7",
 } as const;
 
 export type Generator =
@@ -50,15 +54,14 @@ export const INFO = {
     ids: Object.values(IDS),
     responseFormat:
       "Plain text by default; ?json for compact JSON, ?pretty for JSON with two-space indentation. Flag values are ignored; ?pretty takes precedence. Unknown query parameters are ignored.",
-    examples: [
-      "/hex",
-      "/hex/32?json",
-      "/hex?pretty",
-      "/base64url/16",
-      "/nanoid",
-      "/nanoid/21?json",
+    examples: ["/hex/32", "/nanoid/12?json", "/uuid", "/uuidv7?pretty"],
+    errors: [
+      {
+        status: 400,
+        description: "invalid length or unsupported UUID path parameters",
+      },
+      { status: 404, description: "unmatched routes" },
     ],
-    errors: "400 for invalid length; errors are plain text.",
   },
   build: {
     commit:
