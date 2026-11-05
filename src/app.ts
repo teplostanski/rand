@@ -1,5 +1,6 @@
 import { maxHeaderSize } from "node:http";
 import { fileURLToPath } from "node:url";
+import fastifyCors from "@fastify/cors";
 import fastifyStatic from "@fastify/static";
 import Fastify from "fastify";
 import { isBot } from "isbot";
@@ -42,6 +43,12 @@ app.addHook("onSend", async (_request, reply, payload) => {
   reply.header("X-Written-By", "human");
 
   return payload;
+});
+
+app.register(fastifyCors, {
+  origin: "*",
+  methods: ["GET", "HEAD"],
+  credentials: false,
 });
 
 app.register(fastifyStatic, {
