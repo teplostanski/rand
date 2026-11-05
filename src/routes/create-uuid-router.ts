@@ -1,7 +1,7 @@
 import type { UUID } from "node:crypto";
-import { Router } from "express";
-import { IDS } from "../constants.js";
-import { responseFormat } from "../middleware/response-format.js";
+import type { FastifyPluginAsync } from "fastify";
+import type { IDS } from "../constants.js";
+import { responseFormat } from "../utils/response-format.js";
 import { send } from "../utils/send.js";
 import { sendError } from "../utils/send-error.js";
 
@@ -12,22 +12,28 @@ export const createUUIDRouter = (
   route: UUIDPath,
   key: UUIDResponseKey,
   generate: () => UUID,
-) => {
-  const router = Router();
+): FastifyPluginAsync => {
+  return async (app) => {
+    app.get<{ Querystring: Record<string, unknown> }>(
+      route,
+      async (request, reply) => {
+        const uuid = generate();
 
-  router.get(route, responseFormat, (_req, res) => {
-    const uuid = generate();
-
-    send(res, { [key]: uuid }, uuid);
-  });
-
-  router.get(`${route}/*params`, (_req, res) => {
-    sendError(
-      res,
-      400,
-      `Path parameters, including length, are not supported for ${route}. Use ${route} without path parameters.`,
+        return send(
+          reply,
+          responseFormat(request.query),
+          { [key]: uuid },
+          uuid,
+        );
+      },
     );
-  });
 
-  return router;
+    app.get(`${route}/*`, async (_request, reply) => {
+      return sendError(
+        reply,
+        400,
+        `Path parameters, including length, are not supported for ${route}. Use ${route} without path parameters.`,
+      );
+    });
+  };
 };

@@ -1,5 +1,9 @@
-import type { Response } from "express";
+import type { FastifyReply } from "fastify";
 
-export const sendError = (res: Response, status: number, message: string) => {
-  res.status(status).type("text/plain").send(message);
+export const sendError = (
+  reply: FastifyReply,
+  status: number,
+  message: string,
+) => {
+  return reply.code(status).type("text/plain; charset=utf-8").send(message);
 };

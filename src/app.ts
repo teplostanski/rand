@@ -1,7 +1,9 @@
+import { maxHeaderSize } from "node:http";
 import { fileURLToPath } from "node:url";
-import express from "express";
+import fastifyStatic from "@fastify/static";
+import Fastify from "fastify";
 import { isBot } from "isbot";
-import { undevice } from "undevice/express";
+import { undevice } from "undevice";
 import { ROUTES } from "./constants.js";
 import { base64Router } from "./routes/base64.js";
 import { base64urlRouter } from "./routes/base64url.js";
@@ -13,39 +15,53 @@ import { uuidRouter } from "./routes/uuid.js";
 import { uuidv7Router } from "./routes/uuidv7.js";
 import { sendError } from "./utils/send-error.js";
 
-export const app = express();
+export const app = Fastify({
+  trustProxy: process.env.TRUST_PROXY?.trim() || false,
+  logger:
+    process.env.NODE_ENV === "development"
+      ? {
+          transport: {
+            target: "pino-pretty",
+            options: {
+              colorize: true,
+              translateTime: "SYS:HH:MM:ss",
+              ignore: "pid,hostname",
+            },
+          },
+        }
+      : true,
+  routerOptions: {
+    ignoreTrailingSlash: true,
+    caseSensitive: false,
+    maxParamLength: maxHeaderSize,
+  },
+});
 
-app.disable("x-powered-by");
+app.addHook("onSend", async (_request, reply, payload) => {
+  reply.header("Cache-Control", "no-store");
+  reply.header("X-Written-By", "human");
 
-app.get("/og-image.png", (_req, res) => {
-  res.sendFile(
-    fileURLToPath(new URL("../assets/og/og-image.png", import.meta.url)),
+  return payload;
+});
+
+app.register(fastifyStatic, {
+  root: fileURLToPath(new URL("../assets/favicons/", import.meta.url)),
+  index: false,
+  redirect: false,
+});
+
+app.get("/og-image.png", (_req, reply) => {
+  return reply.sendFile(
+    "og-image.png",
+    fileURLToPath(new URL("../assets/og/", import.meta.url)),
   );
 });
 
-app.use(
-  express.static(
-    fileURLToPath(new URL("../assets/favicons/", import.meta.url)),
-    {
-      index: false,
-      redirect: false,
-    },
-  ),
-);
-
-if (process.env.TRUST_PROXY?.trim()) {
-  app.set("trust proxy", process.env.TRUST_PROXY);
-}
-
-app.use((_req, res, next) => {
-  res.set("Cache-Control", "no-store");
-  res.set("X-Written-By", "human");
-  next();
-});
+app.register(healthRouter);
 
 const rawClients = ["curl", "wget"];
 
-export const undeviceMiddleware = undevice({
+export const deviceDetector = undevice({
   isRawClient: rawClients,
   isCrawler: {
     detect: isBot,
@@ -53,17 +69,29 @@ export const undeviceMiddleware = undevice({
   },
 });
 
-app.use(undeviceMiddleware);
+app.register(async (service) => {
+  service.decorateRequest("undevice");
 
-app.use(healthRouter);
-app.use(ROUTES.root, rootRouter);
-app.use(ROUTES.hex, hexRouter);
-app.use(ROUTES.base64, base64Router);
-app.use(ROUTES.base64url, base64urlRouter);
-app.use(ROUTES.nanoid, nanoidRouter);
-app.use(uuidRouter);
-app.use(uuidv7Router);
+  service.addHook("onRequest", async (request) => {
+    request.undevice = deviceDetector.detect({
+      headers: request.headers,
+    });
+  });
 
-app.use((req, res) => {
-  sendError(res, 404, `Cannot ${req.method} ${req.path}`);
+  service.register(rootRouter);
+
+  service.register(async (api) => {
+    api.register(hexRouter, { prefix: ROUTES.hex });
+    api.register(base64Router, { prefix: ROUTES.base64 });
+    api.register(base64urlRouter, { prefix: ROUTES.base64url });
+    api.register(nanoidRouter, { prefix: ROUTES.nanoid });
+    api.register(uuidRouter);
+    api.register(uuidv7Router);
+  });
+});
+
+app.setNotFoundHandler(async (request, reply) => {
+  const path = request.url.split("?")[0];
+
+  return sendError(reply, 404, `Cannot ${request.method} ${path}`);
 });

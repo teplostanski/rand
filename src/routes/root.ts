@@ -1,17 +1,20 @@
-import { Router } from "express";
+import type { FastifyPluginAsync } from "fastify";
 import { INFO, ROUTES } from "../constants.js";
 import { formatServiceHtml } from "../utils/format-service-html.js";
 import { formatServiceInfo } from "../utils/format-service-info.js";
 
-export const rootRouter = Router();
+export const rootRouter: FastifyPluginAsync = async (app) => {
+  app.get(ROUTES.root, async (request, reply) => {
+    reply.header("Vary", "User-Agent");
 
-rootRouter.get(ROUTES.root, (_req, res) => {
-  res.vary("User-Agent");
-  if (res.locals.undevice.isCrawler) {
-    res.type("html").send(formatServiceHtml(INFO));
-    return;
-  }
-  res
-    .type("text/plain")
-    .send(formatServiceInfo(INFO, res.locals.undevice.isRawClient));
-});
+    if (request.undevice.isCrawler) {
+      return reply
+        .type("text/html; charset=utf-8")
+        .send(formatServiceHtml(INFO));
+    }
+
+    return reply
+      .type("text/plain; charset=utf-8")
+      .send(formatServiceInfo(INFO, request.undevice.isRawClient));
+  });
+};

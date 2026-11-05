@@ -1,8 +1,9 @@
-import type { UndeviceMiddlewareFlags } from "undevice/express";
-import type { undeviceMiddleware } from "../app.js";
+import type { deviceDetector } from "../app.js";
 
-type Flags = UndeviceMiddlewareFlags<typeof undeviceMiddleware>;
+type DeviceInfo = ReturnType<typeof deviceDetector.detect>;
 
-declare module "undevice/express" {
-  interface UndeviceCustomFlags extends Flags {}
+declare module "fastify" {
+  interface FastifyRequest {
+    undevice: DeviceInfo;
+  }
 }

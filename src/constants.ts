@@ -19,7 +19,7 @@ export const ROUTES = {
   nanoid: "/nanoid",
   uuid: "/uuid",
   uuidv7: "/uuidv7",
-  optionalParam: (param: string) => `{/:${param}}`,
+  optionalParam: (param: string) => `/:${param}?`,
 } as const;
 
 export const FORMATS = {

@@ -1,12 +1,12 @@
-import { Router } from "express";
+import type { FastifyPluginAsync } from "fastify";
 import { type Generator, ROUTES } from "../constants.js";
-import { responseFormat } from "../middleware/response-format.js";
+import { responseFormat } from "../utils/response-format.js";
+import { send } from "../utils/send.js";
+import { sendError } from "../utils/send-error.js";
 import {
   type LengthOptions,
   validateLength,
-} from "../middleware/validate-length.js";
-
-import { send } from "../utils/send.js";
+} from "../utils/validate-length.js";
 
 type RandomRouterOptions = {
   responseKey: Generator;
@@ -14,24 +14,35 @@ type RandomRouterOptions = {
   generate: (length: number) => string;
 };
 
+type RandomRequest = {
+  Params: Partial<Record<LengthOptions["param"], string>>;
+  Querystring: Record<string, unknown>;
+};
+
 export const createRandomRouter = ({
   responseKey,
   length,
   generate,
-}: RandomRouterOptions) => {
-  const router = Router();
+}: RandomRouterOptions): FastifyPluginAsync => {
+  return async (app) => {
+    app.get<RandomRequest>(
+      ROUTES.optionalParam(length.param),
+      async (request, reply) => {
+        const size = validateLength(request.params[length.param], length);
 
-  router.use(responseFormat);
+        if (size === undefined) {
+          return sendError(reply, 400, "Invalid length");
+        }
 
-  router.get(
-    ROUTES.optionalParam(length.param),
-    validateLength(length),
-    (_req, res) => {
-      const value = generate(res.locals[length.param]);
+        const value = generate(size);
 
-      send(res, { [responseKey]: value }, value);
-    },
-  );
-
-  return router;
+        return send(
+          reply,
+          responseFormat(request.query),
+          { [responseKey]: value },
+          value,
+        );
+      },
+    );
+  };
 };

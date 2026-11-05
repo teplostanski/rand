@@ -7,33 +7,35 @@ if (!Number.isInteger(port) || port < 1 || port > 65535) {
   throw new Error("PORT must be an integer between 1 and 65535");
 }
 
-const server = app.listen(port, host, () => {
-  console.info(`Server listening on http://${host}:${port}`);
-});
-
-server.on("error", (error) => {
-  console.error("Server failed:", error);
-  process.exitCode = 1;
-});
-
 let shuttingDown = false;
-function shutdown(signal: string) {
+async function shutdown(signal: string) {
   if (shuttingDown) return;
   shuttingDown = true;
-  console.info(`${signal}: shutting down`);
+  app.log.info({ signal }, "Shutting down");
 
   const timeout = setTimeout(() => {
-    console.error("Shutdown timed out");
+    app.log.error("Shutdown timed out");
     process.exit(1);
   }, 10_000);
   timeout.unref();
 
-  server.close((error) => {
+  try {
+    await app.close();
+  } catch (error) {
+    app.log.error(error, "Shutdown failed");
+    process.exitCode = 1;
+  } finally {
     clearTimeout(timeout);
-    if (error) console.error(error);
-    process.exitCode = error ? 1 : 0;
-  });
+  }
 }
 
 process.on("SIGINT", shutdown);
 process.on("SIGTERM", shutdown);
+
+try {
+  await app.listen({ port, host });
+} catch (error) {
+  app.log.error(error, "Server failed to start");
+  process.exitCode = 1;
+  await shutdown("startup failure");
+}
