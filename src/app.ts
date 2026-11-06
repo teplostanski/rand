@@ -58,6 +58,37 @@ app.addHook("onSend", async (_request, reply, payload) => {
   return payload;
 });
 
+await app.register(fastifyRateLimit, {
+  global: false,
+  max: rateLimitMax,
+  timeWindow: rateLimitWindowMs,
+  cache: 5_000,
+});
+
+app.addHook("onRequest", app.rateLimit());
+
+app.addHook("onRequest", async (request, reply) => {
+  if (
+    Number(request.headers["content-length"] ?? 0) > 0 ||
+    request.headers["transfer-encoding"] !== undefined
+  ) {
+    reply.header("Connection", "close");
+    return sendError(reply, 413, "Request bodies are not supported.");
+  }
+});
+
+app.setErrorHandler((error, _request, reply) => {
+  if (
+    error instanceof Error &&
+    "statusCode" in error &&
+    error.statusCode === 429
+  ) {
+    return sendError(reply, 429, "Too many requests. Try again later.");
+  }
+
+  throw error;
+});
+
 app.register(fastifyCors, {
   origin: "*",
   methods: ["GET", "HEAD"],
@@ -106,32 +137,12 @@ app.register(async (service) => {
 
   service.register(rootRouter);
 
-  service.register(async (api) => {
-    await api.register(fastifyRateLimit, {
-      max: rateLimitMax,
-      timeWindow: rateLimitWindowMs,
-      cache: 5_000,
-    });
-
-    api.setErrorHandler((error, _request, reply) => {
-      if (
-        error instanceof Error &&
-        "statusCode" in error &&
-        error.statusCode === 429
-      ) {
-        return sendError(reply, 429, "Too many requests. Try again later.");
-      }
-
-      throw error;
-    });
-
-    api.register(hexRouter, { prefix: ROUTES.hex });
-    api.register(base64Router, { prefix: ROUTES.base64 });
-    api.register(base64urlRouter, { prefix: ROUTES.base64url });
-    api.register(nanoidRouter, { prefix: ROUTES.nanoid });
-    api.register(uuidRouter);
-    api.register(uuidv7Router);
-  });
+  service.register(hexRouter, { prefix: ROUTES.hex });
+  service.register(base64Router, { prefix: ROUTES.base64 });
+  service.register(base64urlRouter, { prefix: ROUTES.base64url });
+  service.register(nanoidRouter, { prefix: ROUTES.nanoid });
+  service.register(uuidRouter);
+  service.register(uuidv7Router);
 });
 
 app.setNotFoundHandler(async (request, reply) => {
