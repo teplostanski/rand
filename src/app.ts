@@ -1,6 +1,7 @@
 import { maxHeaderSize } from "node:http";
 import { fileURLToPath } from "node:url";
 import fastifyCors from "@fastify/cors";
+import fastifyRateLimit from "@fastify/rate-limit";
 import fastifyStatic from "@fastify/static";
 import Fastify from "fastify";
 import { isBot } from "isbot";
@@ -15,6 +16,18 @@ import { rootRouter } from "./routes/root.js";
 import { uuidRouter } from "./routes/uuid.js";
 import { uuidv7Router } from "./routes/uuidv7.js";
 import { sendError } from "./utils/send-error.js";
+
+const rateLimitMax = Number(process.env.RATE_LIMIT_MAX ?? 60);
+const rateLimitWindowMs = Number(process.env.RATE_LIMIT_WINDOW_MS ?? 60_000);
+
+for (const [name, value] of Object.entries({
+  RATE_LIMIT_MAX: rateLimitMax,
+  RATE_LIMIT_WINDOW_MS: rateLimitWindowMs,
+})) {
+  if (!Number.isSafeInteger(value) || value <= 0) {
+    throw new Error(`${name} must be a positive safe integer`);
+  }
+}
 
 export const app = Fastify({
   trustProxy: process.env.TRUST_PROXY?.trim() || false,
@@ -49,6 +62,12 @@ app.register(fastifyCors, {
   origin: "*",
   methods: ["GET", "HEAD"],
   credentials: false,
+  exposedHeaders: [
+    "Retry-After",
+    "X-RateLimit-Limit",
+    "X-RateLimit-Remaining",
+    "X-RateLimit-Reset",
+  ],
 });
 
 app.register(fastifyStatic, {
@@ -88,6 +107,24 @@ app.register(async (service) => {
   service.register(rootRouter);
 
   service.register(async (api) => {
+    await api.register(fastifyRateLimit, {
+      max: rateLimitMax,
+      timeWindow: rateLimitWindowMs,
+      cache: 5_000,
+    });
+
+    api.setErrorHandler((error, _request, reply) => {
+      if (
+        error instanceof Error &&
+        "statusCode" in error &&
+        error.statusCode === 429
+      ) {
+        return sendError(reply, 429, "Too many requests. Try again later.");
+      }
+
+      throw error;
+    });
+
     api.register(hexRouter, { prefix: ROUTES.hex });
     api.register(base64Router, { prefix: ROUTES.base64 });
     api.register(base64urlRouter, { prefix: ROUTES.base64url });

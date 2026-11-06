@@ -9,6 +9,16 @@ services:
       HOST: "0.0.0.0"
       PORT: "3000"
       TRUST_PROXY: ${TRUST_PROXY:?Set TRUST_PROXY in the VPS .env file}
+      NODE_OPTIONS: "--max-old-space-size=64"
+      RATE_LIMIT_MAX: ${RATE_LIMIT_MAX:-60}
+      RATE_LIMIT_WINDOW_MS: ${RATE_LIMIT_WINDOW_MS:-60000}
+    mem_limit: 128m
+    cpus: 0.5
+    logging:
+      driver: json-file
+      options:
+        max-size: "5m"
+        max-file: "2"
     restart: unless-stopped
     stop_grace_period: 15s
 
