@@ -19,6 +19,8 @@ services:
       options:
         max-size: "5m"
         max-file: "2"
+    dns:
+      - 127.0.0.1
     read_only: true
     cap_drop:
       - ALL

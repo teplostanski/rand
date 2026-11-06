@@ -7,6 +7,8 @@ services:
       HOST: 0.0.0.0
       PORT: "3000"
       TRUST_PROXY: ${TRUST_PROXY:-}
+    dns:
+      - 127.0.0.1
     read_only: true
     cap_drop:
       - ALL
