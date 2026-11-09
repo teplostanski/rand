@@ -1,11 +1,12 @@
 import { maxHeaderSize } from "node:http";
 import { fileURLToPath } from "node:url";
+import fastifyAccepts from "@fastify/accepts";
 import fastifyCors from "@fastify/cors";
 import fastifyRateLimit from "@fastify/rate-limit";
 import fastifyStatic from "@fastify/static";
 import Fastify from "fastify";
 import { isBot } from "isbot";
-import { undevice } from "undevice";
+import { undevice } from "undevice/fastify";
 import { ROUTES } from "./constants.js";
 import { base64Router } from "./routes/base64.js";
 import { base64urlRouter } from "./routes/base64url.js";
@@ -50,6 +51,20 @@ export const app = Fastify({
     maxParamLength: maxHeaderSize,
   },
 });
+
+await app.register(fastifyAccepts);
+
+const rawClients = ["curl", "wget"];
+
+export const undevicePlugin = undevice({
+  isRawClient: rawClients,
+  isCrawler: {
+    detect: isBot,
+    exclude: rawClients,
+  },
+});
+
+await app.register(undevicePlugin);
 
 app.addHook("onSend", async (_request, reply, payload) => {
   reply.header("Cache-Control", "no-store");
@@ -116,25 +131,7 @@ app.get("/og-image.png", (_req, reply) => {
 
 app.register(healthRouter);
 
-const rawClients = ["curl", "wget"];
-
-export const deviceDetector = undevice({
-  isRawClient: rawClients,
-  isCrawler: {
-    detect: isBot,
-    exclude: rawClients,
-  },
-});
-
 app.register(async (service) => {
-  service.decorateRequest("undevice");
-
-  service.addHook("onRequest", async (request) => {
-    request.undevice = deviceDetector.detect({
-      headers: request.headers,
-    });
-  });
-
   service.register(rootRouter);
 
   service.register(hexRouter, { prefix: ROUTES.hex });

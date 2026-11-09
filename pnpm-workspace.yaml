@@ -1,7 +1,7 @@
 allowBuilds:
   esbuild: true
 minimumReleaseAgeExclude:
-  - undevice@1.1.0
+  - undevice
 overrides:
   "@fastify/static>glob": ^14.0.2
   "glob>minimatch": ^11.0.1

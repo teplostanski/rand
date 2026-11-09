@@ -1,9 +1,8 @@
-import type { deviceDetector } from "../app.js";
+import type { UndevicePluginFlags } from "undevice/fastify";
+import type { undevicePlugin } from "../app.js";
 
-type DeviceInfo = ReturnType<typeof deviceDetector.detect>;
+type Flags = UndevicePluginFlags<typeof undevicePlugin>;
 
-declare module "fastify" {
-  interface FastifyRequest {
-    undevice: DeviceInfo;
-  }
+declare module "undevice/fastify" {
+  interface UndeviceCustomFlags extends Flags {}
 }
