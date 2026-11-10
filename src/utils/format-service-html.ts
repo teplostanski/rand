@@ -9,7 +9,10 @@ const escapeHtml = (value: string): string =>
     .replaceAll('"', "&quot;")
     .replaceAll("'", "&#39;");
 
-export const formatServiceHtml = (info: typeof INFO): string => {
+export const formatServiceHtml = (
+  info: typeof INFO,
+  locale: string,
+): string => {
   const title = escapeHtml(`${info.name}: Randomness. On demand.`);
   const description = escapeHtml(info.description);
   const url = escapeHtml(new URL("/", info.baseUrl).href);
@@ -46,7 +49,7 @@ export const formatServiceHtml = (info: typeof INFO): string => {
 <body>
   <main>
     <h1>${escapeHtml(info.name)}</h1>
-    <pre>${escapeHtml(formatServiceInfo(info, false))}</pre>
+    <pre>${escapeHtml(formatServiceInfo(info, false, locale))}</pre>
     <a href="${escapeHtml(info.githubUrl)}">GitHub</a>
   </main>
 </body>

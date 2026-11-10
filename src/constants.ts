@@ -1,4 +1,5 @@
 import packageInfo from "../package.json" with { type: "json" };
+import { safeLocaleDateString } from "./utils/safe-locale-date-string.js";
 
 export const NEW_LINE = "\n";
 
@@ -67,9 +68,14 @@ export const INFO = {
     commit:
       process.env.BUILD_COMMIT?.trim() ||
       (IS_DEVELOPMENT ? "0000000" : undefined),
-    date:
-      process.env.BUILD_DATE?.trim() ||
-      (IS_DEVELOPMENT ? new Date().toISOString().slice(0, 10) : undefined),
+    date: (locale: string) => {
+      const buildDate = process.env.BUILD_DATE?.trim() ?? "0000-00-00";
+
+      if (IS_DEVELOPMENT) {
+        return safeLocaleDateString(new Date());
+      }
+      return safeLocaleDateString(new Date(buildDate), locale);
+    },
   },
   githubUrl: "https://github.com/teplostanski/rand",
 } as const;

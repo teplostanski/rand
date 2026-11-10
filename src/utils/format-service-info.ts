@@ -11,6 +11,7 @@ import {
 export const formatServiceInfo = (
   info: typeof INFO,
   isTerminal: boolean,
+  locale: string,
 ): string => {
   const color = (name: "blue" | "green" | "yellow", text: string) =>
     isTerminal ? styleText(name, text, { validateStream: false }) : text;
@@ -22,7 +23,7 @@ export const formatServiceInfo = (
     info.build.commit
       ? `build ${blue(info.build.commit.slice(0, 7))}`
       : undefined,
-    info.build.date ? `update ${blue(info.build.date)}` : undefined,
+    info.build.date ? `update ${blue(info.build.date(locale))}` : undefined,
   ]
     .filter(Boolean)
     .join(" · ");
