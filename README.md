@@ -100,21 +100,21 @@ These examples use `fetch` in Node.js with ES modules.
 Read a plain text response:
 
 ```js
-const response = await fetch("https://rand.hacks.run/hex");
-if (!response.ok) throw new Error(await response.text());
+const response = await fetch('https://rand.hacks.run/hex')
+if (!response.ok) throw new Error(await response.text())
 
-const hex = await response.text();
-console.log(hex);
+const hex = await response.text()
+console.log(hex)
 ```
 
 Read a JSON response:
 
 ```js
-const response = await fetch("https://rand.hacks.run/base64/32?json");
-if (!response.ok) throw new Error(await response.text());
+const response = await fetch('https://rand.hacks.run/base64/32?json')
+if (!response.ok) throw new Error(await response.text())
 
-const { base64 } = await response.json();
-console.log(base64);
+const { base64 } = await response.json()
+console.log(base64)
 ```
 
 JSON responses use the generator name as the key: `hex`, `base64`, `base64url`, `nanoid`, `uuid`, or `uuidv7`. For example, `/nanoid?json` returns `{"nanoid":"..."}`. Both JSON formats use `Content-Type: application/json`. Text responses contain only the generated value and use `Content-Type: text/plain`.

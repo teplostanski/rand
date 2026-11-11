@@ -1,52 +1,50 @@
-import packageInfo from "../package.json" with { type: "json" };
-import { safeLocaleDateString } from "./utils/safe-locale-date-string.js";
+import packageInfo from '../package.json' with { type: 'json' }
+import { safeLocaleDateString } from './utils/safe-locale-date-string.js'
 
-export const NEW_LINE = "\n";
+export const NEW_LINE = '\n'
 
-export const DEFAULT_BYTE_LENGTH = 16;
-export const MAX_BYTE_LENGTH = 1_000;
-export const DEFAULT_ID_LENGTH = 21;
-export const MAX_ID_LENGTH = 1_000;
+export const DEFAULT_BYTE_LENGTH = 16
+export const MAX_BYTE_LENGTH = 1_000
+export const DEFAULT_ID_LENGTH = 21
+export const MAX_ID_LENGTH = 1_000
 
-const API_VERSION = "1.3";
-const IS_DEVELOPMENT = process.env.NODE_ENV === "development";
+const API_VERSION = '1.3'
+const IS_DEVELOPMENT = process.env.NODE_ENV === 'development'
 
 export const ROUTES = {
-  root: "/",
-  health: "/health",
-  hex: "/hex",
-  base64: "/base64",
-  base64url: "/base64url",
-  nanoid: "/nanoid",
-  uuid: "/uuid",
-  uuidv7: "/uuidv7",
+  root: '/',
+  health: '/health',
+  hex: '/hex',
+  base64: '/base64',
+  base64url: '/base64url',
+  nanoid: '/nanoid',
+  uuid: '/uuid',
+  uuidv7: '/uuidv7',
   optionalParam: (param: string) => `/:${param}?`,
-} as const;
+} as const
 
 export const FORMATS = {
-  plainText: "text",
-  json: "json",
-  prettyJson: "pretty",
-} as const;
+  plainText: 'text',
+  json: 'json',
+  prettyJson: 'pretty',
+} as const
 
 export const ENCODINGS = {
-  hex: "hex",
-  base64: "base64",
-  base64url: "base64url",
-} as const;
+  hex: 'hex',
+  base64: 'base64',
+  base64url: 'base64url',
+} as const
 
 export const IDS = {
-  nanoid: "nanoid",
-  uuid: "uuid",
-  uuidv7: "uuidv7",
-} as const;
+  nanoid: 'nanoid',
+  uuid: 'uuid',
+  uuidv7: 'uuidv7',
+} as const
 
-export type Generator =
-  | (typeof ENCODINGS)[keyof typeof ENCODINGS]
-  | (typeof IDS)[keyof typeof IDS];
+export type Generator = (typeof ENCODINGS)[keyof typeof ENCODINGS] | (typeof IDS)[keyof typeof IDS]
 
 export const INFO = {
-  baseUrl: "https://rand.hacks.run",
+  baseUrl: 'https://rand.hacks.run',
   name: packageInfo.name,
   description: packageInfo.description,
   apiVersion: API_VERSION,
@@ -54,28 +52,26 @@ export const INFO = {
     encodings: Object.values(ENCODINGS),
     ids: Object.values(IDS),
     responseFormat:
-      "Plain text by default; ?json for compact JSON, ?pretty for JSON with two-space indentation. Flag values are ignored; ?pretty takes precedence. Unknown query parameters are ignored.",
-    examples: ["/hex/32", "/nanoid/12?json", "/uuid", "/uuidv7?pretty"],
+      'Plain text by default; ?json for compact JSON, ?pretty for JSON with two-space indentation. Flag values are ignored; ?pretty takes precedence. Unknown query parameters are ignored.',
+    examples: ['/hex/32', '/nanoid/12?json', '/uuid', '/uuidv7?pretty'],
     errors: [
       {
         status: 400,
-        description: "invalid length or unsupported UUID path parameters",
+        description: 'invalid length or unsupported UUID path parameters',
       },
-      { status: 404, description: "unmatched routes" },
+      { status: 404, description: 'unmatched routes' },
     ],
   },
   build: {
-    commit:
-      process.env.BUILD_COMMIT?.trim() ||
-      (IS_DEVELOPMENT ? "0000000" : undefined),
+    commit: process.env.BUILD_COMMIT?.trim() || (IS_DEVELOPMENT ? '0000000' : undefined),
     date: (locale: string) => {
-      const buildDate = process.env.BUILD_DATE?.trim() ?? "0000-00-00";
+      const buildDate = process.env.BUILD_DATE?.trim() ?? '0000-00-00'
 
       if (IS_DEVELOPMENT) {
-        return safeLocaleDateString(new Date());
+        return safeLocaleDateString(new Date())
       }
-      return safeLocaleDateString(new Date(buildDate), locale);
+      return safeLocaleDateString(new Date(buildDate), locale)
     },
   },
-  githubUrl: "https://github.com/teplostanski/rand",
-} as const;
+  githubUrl: 'https://github.com/teplostanski/rand',
+} as const

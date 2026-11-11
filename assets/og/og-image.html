@@ -25,7 +25,7 @@ p { margin: 0; font-size: 48px; line-height: 1.25; font-weight: 500; color: #bcb
 </main>
 <script>
 let seed = 2317;
-function random() { seed = (seed * 16807) % 2147483647; return (seed - 1) / 2147483646; }
+const random = () => { seed = (seed * 16807) % 2147483647; return (seed - 1) / 2147483646; }
 const symbols = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz{}[]<>/+=*#%&?";
 const rain = document.querySelector(".rain");
 for (let i = 0; i < 44; i++) {

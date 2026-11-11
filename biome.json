@@ -1,17 +1,8 @@
 {
+  "$schema": "./node_modules/@biomejs/biome/configuration_schema.json",
+  "extends": ["@teplostanski/biome-config/configs/base"],
   "files": {
     "includes": ["**", "!!dist", "!!node_modules"]
-  },
-  "formatter": {
-    "enabled": true,
-    "indentStyle": "space",
-    "indentWidth": 2
-  },
-  "linter": {
-    "enabled": true,
-    "rules": {
-      "preset": "none"
-    }
   },
   "assist": {
     "actions": {

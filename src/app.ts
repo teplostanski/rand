@@ -1,46 +1,46 @@
-import { maxHeaderSize } from "node:http";
-import { fileURLToPath } from "node:url";
-import fastifyAccepts from "@fastify/accepts";
-import fastifyCors from "@fastify/cors";
-import fastifyRateLimit from "@fastify/rate-limit";
-import fastifyStatic from "@fastify/static";
-import Fastify from "fastify";
-import { isBot } from "isbot";
-import { undevice } from "undevice/fastify";
-import { ROUTES } from "./constants.js";
-import { base64Router } from "./routes/base64.js";
-import { base64urlRouter } from "./routes/base64url.js";
-import { healthRouter } from "./routes/health.js";
-import { hexRouter } from "./routes/hex.js";
-import { nanoidRouter } from "./routes/nanoid.js";
-import { rootRouter } from "./routes/root.js";
-import { uuidRouter } from "./routes/uuid.js";
-import { uuidv7Router } from "./routes/uuidv7.js";
-import { sendError } from "./utils/send-error.js";
+import { maxHeaderSize } from 'node:http'
+import { fileURLToPath } from 'node:url'
+import fastifyAccepts from '@fastify/accepts'
+import fastifyCors from '@fastify/cors'
+import fastifyRateLimit from '@fastify/rate-limit'
+import fastifyStatic from '@fastify/static'
+import Fastify from 'fastify'
+import { isBot } from 'isbot'
+import { undevice } from 'undevice/fastify'
+import { ROUTES } from './constants.js'
+import { base64Router } from './routes/base64.js'
+import { base64urlRouter } from './routes/base64url.js'
+import { healthRouter } from './routes/health.js'
+import { hexRouter } from './routes/hex.js'
+import { nanoidRouter } from './routes/nanoid.js'
+import { rootRouter } from './routes/root.js'
+import { uuidRouter } from './routes/uuid.js'
+import { uuidv7Router } from './routes/uuidv7.js'
+import { sendError } from './utils/send-error.js'
 
-const rateLimitMax = Number(process.env.RATE_LIMIT_MAX ?? 60);
-const rateLimitWindowMs = Number(process.env.RATE_LIMIT_WINDOW_MS ?? 60_000);
+const rateLimitMax = Number(process.env.RATE_LIMIT_MAX ?? 60)
+const rateLimitWindowMs = Number(process.env.RATE_LIMIT_WINDOW_MS ?? 60_000)
 
 for (const [name, value] of Object.entries({
   RATE_LIMIT_MAX: rateLimitMax,
   RATE_LIMIT_WINDOW_MS: rateLimitWindowMs,
 })) {
   if (!Number.isSafeInteger(value) || value <= 0) {
-    throw new Error(`${name} must be a positive safe integer`);
+    throw new Error(`${name} must be a positive safe integer`)
   }
 }
 
 export const app = Fastify({
   trustProxy: process.env.TRUST_PROXY?.trim() || false,
   logger:
-    process.env.NODE_ENV === "development"
+    process.env.NODE_ENV === 'development'
       ? {
           transport: {
-            target: "pino-pretty",
+            target: 'pino-pretty',
             options: {
               colorize: true,
-              translateTime: "SYS:HH:MM:ss",
-              ignore: "pid,hostname",
+              translateTime: 'SYS:HH:MM:ss',
+              ignore: 'pid,hostname',
             },
           },
         }
@@ -50,11 +50,11 @@ export const app = Fastify({
     caseSensitive: false,
     maxParamLength: maxHeaderSize,
   },
-});
+})
 
-await app.register(fastifyAccepts);
+await app.register(fastifyAccepts)
 
-const rawClients = ["curl", "wget"];
+const rawClients = ['curl', 'wget']
 
 export const undevicePlugin = undevice({
   isRawClient: rawClients,
@@ -62,88 +62,81 @@ export const undevicePlugin = undevice({
     detect: isBot,
     exclude: rawClients,
   },
-});
+})
 
-await app.register(undevicePlugin);
+await app.register(undevicePlugin)
 
-app.addHook("onSend", async (_request, reply, payload) => {
-  reply.header("Cache-Control", "no-store");
-  reply.header("X-Written-By", "human");
+app.addHook('onSend', async (_request, reply, payload) => {
+  reply.header('Cache-Control', 'no-store')
+  reply.header('X-Written-By', 'human')
 
-  return payload;
-});
+  return payload
+})
 
 await app.register(fastifyRateLimit, {
   global: false,
   max: rateLimitMax,
   timeWindow: rateLimitWindowMs,
   cache: 5_000,
-});
+})
 
-app.addHook("onRequest", app.rateLimit());
+app.addHook('onRequest', app.rateLimit())
 
-app.addHook("onRequest", async (request, reply) => {
+app.addHook('onRequest', async (request, reply) => {
   if (
-    Number(request.headers["content-length"] ?? 0) > 0 ||
-    request.headers["transfer-encoding"] !== undefined
+    Number(request.headers['content-length'] ?? 0) > 0 ||
+    request.headers['transfer-encoding'] !== undefined
   ) {
-    reply.header("Connection", "close");
-    return sendError(reply, 413, "Request bodies are not supported.");
+    reply.header('Connection', 'close')
+    return sendError(reply, 413, 'Request bodies are not supported.')
   }
-});
+})
 
 app.setErrorHandler((error, _request, reply) => {
-  if (
-    error instanceof Error &&
-    "statusCode" in error &&
-    error.statusCode === 429
-  ) {
-    return sendError(reply, 429, "Too many requests. Try again later.");
+  if (error instanceof Error && 'statusCode' in error && error.statusCode === 429) {
+    return sendError(reply, 429, 'Too many requests. Try again later.')
   }
 
-  throw error;
-});
+  throw error
+})
 
 app.register(fastifyCors, {
-  origin: "*",
-  methods: ["GET", "HEAD"],
+  origin: '*',
+  methods: ['GET', 'HEAD'],
   credentials: false,
   exposedHeaders: [
-    "Retry-After",
-    "X-RateLimit-Limit",
-    "X-RateLimit-Remaining",
-    "X-RateLimit-Reset",
+    'Retry-After',
+    'X-RateLimit-Limit',
+    'X-RateLimit-Remaining',
+    'X-RateLimit-Reset',
   ],
-});
+})
 
 app.register(fastifyStatic, {
-  root: fileURLToPath(new URL("../assets/favicons/", import.meta.url)),
+  root: fileURLToPath(new URL('../assets/favicons/', import.meta.url)),
   index: false,
   redirect: false,
-});
+})
 
-app.get("/og-image.png", (_req, reply) => {
-  return reply.sendFile(
-    "og-image.png",
-    fileURLToPath(new URL("../assets/og/", import.meta.url)),
-  );
-});
+app.get('/og-image.png', (_req, reply) => {
+  return reply.sendFile('og-image.png', fileURLToPath(new URL('../assets/og/', import.meta.url)))
+})
 
-app.register(healthRouter);
+app.register(healthRouter)
 
-app.register(async (service) => {
-  service.register(rootRouter);
+app.register(async service => {
+  service.register(rootRouter)
 
-  service.register(hexRouter, { prefix: ROUTES.hex });
-  service.register(base64Router, { prefix: ROUTES.base64 });
-  service.register(base64urlRouter, { prefix: ROUTES.base64url });
-  service.register(nanoidRouter, { prefix: ROUTES.nanoid });
-  service.register(uuidRouter);
-  service.register(uuidv7Router);
-});
+  service.register(hexRouter, { prefix: ROUTES.hex })
+  service.register(base64Router, { prefix: ROUTES.base64 })
+  service.register(base64urlRouter, { prefix: ROUTES.base64url })
+  service.register(nanoidRouter, { prefix: ROUTES.nanoid })
+  service.register(uuidRouter)
+  service.register(uuidv7Router)
+})
 
 app.setNotFoundHandler(async (request, reply) => {
-  const path = request.url.split("?")[0];
+  const path = request.url.split('?')[0]
 
-  return sendError(reply, 404, `Cannot ${request.method} ${path}`);
-});
+  return sendError(reply, 404, `Cannot ${request.method} ${path}`)
+})

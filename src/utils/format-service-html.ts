@@ -1,23 +1,20 @@
-import type { INFO } from "../constants.js";
-import { formatServiceInfo } from "./format-service-info.js";
+import type { INFO } from '../constants.js'
+import { formatServiceInfo } from './format-service-info.js'
 
 const escapeHtml = (value: string): string =>
   value
-    .replaceAll("&", "&amp;")
-    .replaceAll("<", "&lt;")
-    .replaceAll(">", "&gt;")
-    .replaceAll('"', "&quot;")
-    .replaceAll("'", "&#39;");
+    .replaceAll('&', '&amp;')
+    .replaceAll('<', '&lt;')
+    .replaceAll('>', '&gt;')
+    .replaceAll('"', '&quot;')
+    .replaceAll("'", '&#39;')
 
-export const formatServiceHtml = (
-  info: typeof INFO,
-  locale: string,
-): string => {
-  const title = escapeHtml(`${info.name}: Randomness. On demand.`);
-  const description = escapeHtml(info.description);
-  const url = escapeHtml(new URL("/", info.baseUrl).href);
-  const image = escapeHtml(new URL("/og-image.png", info.baseUrl).href);
-  const imageAlt = "rand.hacks.run: Randomness. On demand.";
+export const formatServiceHtml = (info: typeof INFO, locale: string): string => {
+  const title = escapeHtml(`${info.name}: Randomness. On demand.`)
+  const description = escapeHtml(info.description)
+  const url = escapeHtml(new URL('/', info.baseUrl).href)
+  const image = escapeHtml(new URL('/og-image.png', info.baseUrl).href)
+  const imageAlt = 'rand.hacks.run: Randomness. On demand.'
 
   return `<!doctype html>
 <html lang="en">
@@ -53,5 +50,5 @@ export const formatServiceHtml = (
     <a href="${escapeHtml(info.githubUrl)}">GitHub</a>
   </main>
 </body>
-</html>`;
-};
+</html>`
+}
