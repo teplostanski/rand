@@ -37,11 +37,11 @@ GET /uuid
 GET /uuidv7
 ```
 
-| Parameter | Values | Default |
-| --- | --- | --- |
-| `encoding` | `hex`, `base64`, `base64url` | Required for encoded bytes |
-| `byteLength` | Integer from 1 to 1000 bytes; optional for encodings | `16` |
-| `nanoidLength` | Integer from 1 to 1000 characters; optional for Nano ID | `21` |
+| Parameter      | Values                                                  | Default                    |
+| -------------- | ------------------------------------------------------- | -------------------------- |
+| `encoding`     | `hex`, `base64`, `base64url`                            | Required for encoded bytes |
+| `byteLength`   | Integer from 1 to 1000 bytes; optional for encodings    | `16`                       |
+| `nanoidLength` | Integer from 1 to 1000 characters; optional for Nano ID | `21`                       |
 
 `byteLength` is the number of random bytes **before encoding**, not the length of the resulting string. For example, 16 bytes produce 32 hex characters or 24 base64 characters, including padding.
 
@@ -94,7 +94,7 @@ These examples use `fetch` in Node.js with ES modules.
 Read a plain text response:
 
 ```js
-const response = await fetch('https://rand.hacks.run/hex');
+const response = await fetch("https://rand.hacks.run/hex");
 if (!response.ok) throw new Error(await response.text());
 
 const hex = await response.text();
@@ -104,7 +104,7 @@ console.log(hex);
 Read a JSON response:
 
 ```js
-const response = await fetch('https://rand.hacks.run/base64/32?json');
+const response = await fetch("https://rand.hacks.run/base64/32?json");
 if (!response.ok) throw new Error(await response.text());
 
 const { base64 } = await response.json();

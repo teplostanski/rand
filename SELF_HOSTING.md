@@ -68,14 +68,14 @@ A `502` response is expected until the application is running.
 
 In your fork, open **Settings → Secrets and variables → Actions → New repository secret**:
 
-| Secret | Value |
-| --- | --- |
-| `VPS_HOST` | VPS IP address or SSH hostname |
-| `VPS_PORT` | SSH port, e.g. `10022` |
-| `VPS_USER` | Deployment user, e.g. `deploy` |
-| `VPS_DEPLOY_PATH` | Absolute deployment directory, e.g. `/home/deploy/apps/rand`; do not use `~` |
-| `VPS_SSH_KEY` | Complete private deployment key, including its header and footer; no passphrase |
-| `VPS_KNOWN_HOSTS` | Verified SSH host-key record for the configured host and port |
+| Secret            | Value                                                                           |
+| ----------------- | ------------------------------------------------------------------------------- |
+| `VPS_HOST`        | VPS IP address or SSH hostname                                                  |
+| `VPS_PORT`        | SSH port, e.g. `10022`                                                          |
+| `VPS_USER`        | Deployment user, e.g. `deploy`                                                  |
+| `VPS_DEPLOY_PATH` | Absolute deployment directory, e.g. `/home/deploy/apps/rand`; do not use `~`    |
+| `VPS_SSH_KEY`     | Complete private deployment key, including its header and footer; no passphrase |
+| `VPS_KNOWN_HOSTS` | Verified SSH host-key record for the configured host and port                   |
 
 The deployment key's public half must be in the user's `~/.ssh/authorized_keys`. An existing deployment key can be reused. `VPS_SSH_KEY` is not the public key or the server host key.
 
@@ -110,17 +110,17 @@ sudo journalctl -u caddy -n 50 --no-pager
 
 If the first deployment failed before installing `compose.yaml`, check the failed workflow step first; the Compose diagnostics above require that file.
 
-| Problem | Check |
-| --- | --- |
-| Missing `APP_IMAGE` or `TRUST_PROXY` | Set both in the deployment directory's `.env`. During deployment, the workflow supplies `APP_IMAGE` and saves it after success. |
-| External network not found | Create `rand_default` on the VPS and use its actual gateway for `TRUST_PROXY`. |
-| Port already allocated | Choose a free `HOST_PORT` and update the Caddy upstream to match. |
-| SSH authentication fails | Check the user, port, private key, and `authorized_keys`. The workflow requires a key without a passphrase. |
-| Host-key verification fails | Check `VPS_KNOWN_HOSTS` against the configured host and port. Verify any changed fingerprint before replacing the record. |
-| Image pull denied | Check GHCR visibility or log in as the deployment user with package read access. |
-| Docker permission denied | The SSH user must be able to run Docker without `sudo`. |
-| HTTPS returns `502` | Check container health, `HOST_PORT`, the Caddy upstream, and both services' logs. |
-| Client IP is incorrect | Check `TRUST_PROXY` against the proxy address visible to the container (the Docker network gateway in this setup), then recreate the container after changing `.env`. |
-| SSH connection times out | Check the address, port, firewall, and access from GitHub-hosted runners. |
+| Problem                              | Check                                                                                                                                                                 |
+| ------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Missing `APP_IMAGE` or `TRUST_PROXY` | Set both in the deployment directory's `.env`. During deployment, the workflow supplies `APP_IMAGE` and saves it after success.                                       |
+| External network not found           | Create `rand_default` on the VPS and use its actual gateway for `TRUST_PROXY`.                                                                                        |
+| Port already allocated               | Choose a free `HOST_PORT` and update the Caddy upstream to match.                                                                                                     |
+| SSH authentication fails             | Check the user, port, private key, and `authorized_keys`. The workflow requires a key without a passphrase.                                                           |
+| Host-key verification fails          | Check `VPS_KNOWN_HOSTS` against the configured host and port. Verify any changed fingerprint before replacing the record.                                             |
+| Image pull denied                    | Check GHCR visibility or log in as the deployment user with package read access.                                                                                      |
+| Docker permission denied             | The SSH user must be able to run Docker without `sudo`.                                                                                                               |
+| HTTPS returns `502`                  | Check container health, `HOST_PORT`, the Caddy upstream, and both services' logs.                                                                                     |
+| Client IP is incorrect               | Check `TRUST_PROXY` against the proxy address visible to the container (the Docker network gateway in this setup), then recreate the container after changing `.env`. |
+| SSH connection times out             | Check the address, port, firewall, and access from GitHub-hosted runners.                                                                                             |
 
 After correcting GitHub Secrets or VPS settings, use **Re-run failed jobs** in GitHub Actions. After changing repository files, push a new commit and use its workflow run: rerunning an old run uses the old configuration.
