@@ -58,31 +58,37 @@ These flags apply to generator endpoints. `/` returns HTML with social metadata 
 ### curl
 
 16 random bytes as hex (_plain text_)
+
 ```bash
 curl rand.hacks.run/hex
 ```
 
 32 random bytes as base64 (_JSON_)
+
 ```bash
 curl 'rand.hacks.run/base64/32?json'
 ```
 
 Nano ID with 21 characters (_JSON_)
+
 ```bash
 curl 'rand.hacks.run/nanoid/21?json'
 ```
 
 UUIDv4 (_plain text_)
+
 ```bash
 curl rand.hacks.run/uuid
 ```
 
 UUIDv7 (_JSON_)
+
 ```bash
 curl 'rand.hacks.run/uuidv7?json'
 ```
 
 16 random bytes as hex (_indented JSON_)
+
 ```bash
 curl 'rand.hacks.run/hex?pretty'
 ```
